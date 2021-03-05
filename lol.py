@@ -93,9 +93,9 @@ def main():
     print('\n Probabilidade do time Azul ganhar caso tenha um placar de visao acima da media, nenhum dragao, e um numero de abates na media(entre 15 e 25): ')
     q2=modelo.query(variables=['blueWins'],evidence={('blueTotalVisao'):'acMedia' , ('blueDragons'):0 , ('blueAbates'):'Media'})
     print(q2)
-    #print('\n Probabilidade do time Azul ganhar caso a media de level do time azul seja de 7 , o CS seja acima da Media,  ')
-    #q3=modelo.query(variables=['blueWins'],evidence={('blueFirstBlood'):1 , ('blueDragons'):0,('blueTotalExperience'):'muito' })
-    #print(q3)
+    print('\n Probabilidade do time Azul ganhar caso a media de level do time azul seja de 7 , o CS seja acima da Media, numero de abates abaixo da media e possuia um dragao. ')
+    q3=modelo.query(variables=['blueWins'],evidence={('blueAvgLevelRounded'):7 , ('blueCSPerMin'):'acMedia', ('blueAbates'):'abMedia', ('blueDragons'):1})
+    print(q3)
 
 
 if __name__ == '__main__':
