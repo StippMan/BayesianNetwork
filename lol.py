@@ -10,9 +10,6 @@ def read_input():
         'blueWardsDestroyed']  #- entrada['redWardsPlaced']
     entrada['blueAbates'] = entrada['blueKills'] + entrada['blueAssists']
     entrada['blueAvgLevelRounded'] = entrada['blueAvgLevel'].astype(int)
-    #print(entrada['blueExperienceDiff'].min(),
-    #entrada['blueExperienceDiff'].max(),
-    #entrada['blueExperienceDiff'].mean(axis=0))
     entrada.drop([
         'gameId', 'redKills', 'redDeaths', 'redGoldDiff', 'redExperienceDiff',
         'redCSPerMin', 'blueAssists', 'redAssists', 'blueWardsPlaced',
@@ -65,31 +62,38 @@ def Model_def(dataFrame):
         x=dataFrame['blueAbates'],
         bins=[0, 10, 15, 25, 55],
         labels=['mBaixo', 'abMedia', 'Media', 'acMedia'])
-    model = BM([('blueCSPerMin', 'blueGoldDiff'),
-                ('blueTotalJungleMinionsKilled', 'blueCSPerMin'),
+    model = BM([#pais
+    			('blueTotalJungleMinionsKilled', 'blueCSPerMin'),
                 ('blueTotalMinionsKilled', 'blueCSPerMin'),
+                ('blueTotalVisao', 'blueDragons'),
+                #nao influenciam diretamente no blueWins
+                ('blueCSPerMin', 'blueGoldDiff'),
                 ('blueCSPerMin', 'blueTotalExperience'),
                 ('blueTotalExperience', 'blueAvgLevelRounded'),
-                ('blueAbates', 'blueGoldDiff'), ('blueGoldDiff', 'blueWins'),
-                ('blueAvgLevelRounded', 'blueWins'),
-                ('blueDragons', 'blueWins'), ('blueTotalVisao', 'blueWins')])
-    print(dataFrame.info())
+                ('blueAvgLevelRounded', 'blueAbates'),
+                ('blueTotalExperience','blueExperienceDiff'),
+                #influenciam diretamente no blueWins 
+                ('blueGoldDiff', 'blueWins'),
+                ('blueExperienceDiff', 'blueWins'),
+                ('blueDragons', 'blueWins')])
     #Calculo de CPD com a estrategia MaximumLikehoodEstimator(default).
     model.fit(dataFrame)
     modelF = VariableElimination(model)
+    #print(model.get_cpds('blueAvgLevelRounded'))
     return modelF
 
 
 def main():
     df = read_input()
     modelo = Model_def(df)
-    #print('\n Probabilidade do time Azul ganhar,caso o time vermelho esteja com vantagem em gold:')
-    #q1=modelo.query(variables=['blueWins'],evidence={'blueGoldDiff':'difNegativa'})
-    #print(q1)
-    #print('\n Probabilidade do time Azul ganhar,caso o time azul de first blood e tenha um dragao: ')
-    #q2=modelo.query(variables=['blueWins'],evidence={('blueFirstBlood'):1 , ('blueDragons'):1})
-    #print(q2)
-    #print('\n Probabilidade do time Azul ganhar,caso o time azul nao de first blood , muita xp e nenhum dragao ')
+    print('\n Sendo blueWins(0) como probabilidade do time azul perder(e, porventura, o time vermelho ganhar).')
+    print('\n Probabilidade do time Azul ganhar caso esteja com vantagem em experiencia, porem o time vermelho esteja com vantagem em gold: ')
+    q1=modelo.query(variables=['blueWins'],evidence={('blueExperienceDiff'):'difPositiva' , ('blueGoldDiff'):'difNegativa'})
+    print(q1)
+    print('\n Probabilidade do time Azul ganhar caso tenha um placar de visao acima da media, nenhum dragao, e um numero de abates na media(entre 15 e 25): ')
+    q2=modelo.query(variables=['blueWins'],evidence={('blueTotalVisao'):'acMedia' , ('blueDragons'):0 , ('blueAbates'):'Media'})
+    print(q2)
+    #print('\n Probabilidade do time Azul ganhar caso a media de level do time azul seja de 7 , o CS seja acima da Media,  ')
     #q3=modelo.query(variables=['blueWins'],evidence={('blueFirstBlood'):1 , ('blueDragons'):0,('blueTotalExperience'):'muito' })
     #print(q3)
 
