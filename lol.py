@@ -9,20 +9,20 @@ def read_input():
     entrada['blueTotalVisao'] = entrada['blueWardsPlaced'] + entrada[
         'blueWardsDestroyed']  #- entrada['redWardsPlaced']
     entrada['blueAbates'] = entrada['blueKills'] + entrada['blueAssists']
-    #print(entrada['blueTotalExperience'].min(),
-          #entrada['blueTotalExperience'].max(),
-          #entrada['blueTotalExperience'].mean(axis=0))
+    entrada['blueAvgLevelRounded'] = entrada['blueAvgLevel'].astype(int)
+    #print(entrada['blueExperienceDiff'].min(),
+    #entrada['blueExperienceDiff'].max(),
+    #entrada['blueExperienceDiff'].mean(axis=0))
     entrada.drop([
-        'gameId', 'redKills', 'redDeaths', 'redGoldDiff', 'blueExperienceDiff',
-        'redExperienceDiff', 'redCSPerMin', 'blueAssists', 'redAssists',
-        'blueWardsPlaced', 'redWardsPlaced', 'blueWardsDestroyed',
-        'redWardsDestroyed', 'redFirstBlood', 'blueAvgLevel', 'redAvgLevel',
-        'blueHeralds', 'redHeralds', 'blueTotalJungleMinionsKilled',
-        'redTotalJungleMinionsKilled', 'blueTowersDestroyed',
+        'gameId', 'redKills', 'redDeaths', 'redGoldDiff', 'redExperienceDiff',
+        'redCSPerMin', 'blueAssists', 'redAssists', 'blueWardsPlaced',
+        'redWardsPlaced', 'blueWardsDestroyed', 'redWardsDestroyed',
+        'redFirstBlood', 'blueAvgLevel', 'redAvgLevel', 'blueHeralds',
+        'redHeralds', 'redTotalJungleMinionsKilled', 'blueTowersDestroyed',
         'redTowersDestroyed', 'blueKills', 'blueDeaths', 'blueEliteMonsters',
         'blueTotalGold', 'blueGoldPerMin', 'redEliteMonsters', 'redDragons',
         'redTotalGold', 'redTotalExperience', 'redTotalMinionsKilled',
-        'redGoldPerMin'
+        'redGoldPerMin', 'blueFirstBlood'
     ],
                  axis=1,
                  inplace=True)
@@ -36,10 +36,16 @@ def Model_def(dataFrame):
     #min,max,mean blueCSPerMin = 9, 28.3, 21.6
     #min,max,mean blueTotalVisao = 5, 254, 25.11
     #min,max,mean blueAbates = 0, 51, 21.3
+    #min,max,mean blueAvgLevelRounded = 4, 8, 6.5
+    #min,max,mean blueExperienceDiff = -9333, 8348, -33
     dataFrame['blueTotalExperience'] = pd.cut(
         x=dataFrame['blueTotalExperience'],
         bins=[0, 12000, 15000, 19000, 23000],
         labels=['mBaixo', 'abMedia', 'Media', 'acMedia'])
+    dataFrame['blueExperienceDiff'] = pd.cut(
+        x=dataFrame['blueExperienceDiff'],
+        bins=[-10000, 0, 10000],
+        labels=['difNegativa', 'difPositiva'])
     dataFrame['blueTotalMinionsKilled'] = pd.cut(
         x=dataFrame['blueTotalMinionsKilled'],
         bins=[0, 215, 300],
@@ -59,13 +65,14 @@ def Model_def(dataFrame):
         x=dataFrame['blueAbates'],
         bins=[0, 10, 15, 25, 55],
         labels=['mBaixo', 'abMedia', 'Media', 'acMedia'])
-
     model = BM([('blueCSPerMin', 'blueGoldDiff'),
-                ('blueTotalMinionsKilled', 'blueTotalExperience'),
-                ('blueGoldDiff', 'blueWins'),
-                ('blueTotalExperience', 'blueWins'),
-                ('blueAbates', 'blueGoldDiff'), ('blueDragons', 'blueWins'),
-                ('blueTotalVisao', 'blueWins')])
+                ('blueTotalJungleMinionsKilled', 'blueCSPerMin'),
+                ('blueTotalMinionsKilled', 'blueCSPerMin'),
+                ('blueCSPerMin', 'blueTotalExperience'),
+                ('blueTotalExperience', 'blueAvgLevelRounded'),
+                ('blueAbates', 'blueGoldDiff'), ('blueGoldDiff', 'blueWins'),
+                ('blueAvgLevelRounded', 'blueWins'),
+                ('blueDragons', 'blueWins'), ('blueTotalVisao', 'blueWins')])
     print(dataFrame.info())
     #Calculo de CPD com a estrategia MaximumLikehoodEstimator(default).
     model.fit(dataFrame)
