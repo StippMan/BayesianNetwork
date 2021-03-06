@@ -78,25 +78,27 @@ def Model_def(dataFrame):
                 ('blueDragons', 'blueWins')])
     #Calculo de CPD com a estrategia MaximumLikehoodEstimator(default).
     model.fit(dataFrame)
+    with open('get_cpds2.txt','a') as f:
+    	print('blueAbates',file=f)
+    	print(model.get_cpds('blueAbates'),file=f)
+    	print("blueDragons",file=f)
+    	print(model.get_cpds('blueDragons'),file=f) 
     modelF = VariableElimination(model)
-    #print(model.get_cpds('blueAvgLevelRounded'))
     return modelF
 
 
 def main():
     df = read_input()
     modelo = Model_def(df)
-    print('\n Sendo blueWins(0) como probabilidade do time azul perder(e, porventura, o time vermelho ganhar).')
-    print('\n Probabilidade do time Azul ganhar caso esteja com vantagem em experiencia, porem o time vermelho esteja com vantagem em gold: ')
-    q1=modelo.query(variables=['blueWins'],evidence={('blueExperienceDiff'):'difPositiva' , ('blueGoldDiff'):'difNegativa'})
-    print(q1)
-    print('\n Probabilidade do time Azul ganhar caso tenha um placar de visao acima da media, nenhum dragao, e um numero de abates na media(entre 15 e 25): ')
-    q2=modelo.query(variables=['blueWins'],evidence={('blueTotalVisao'):'acMedia' , ('blueDragons'):0 , ('blueAbates'):'Media'})
-    print(q2)
-    print('\n Probabilidade do time Azul ganhar caso a media de level do time azul seja de 7 , o CS seja acima da Media, numero de abates abaixo da media e possuia um dragao. ')
-    q3=modelo.query(variables=['blueWins'],evidence={('blueAvgLevelRounded'):7 , ('blueCSPerMin'):'acMedia', ('blueAbates'):'abMedia', ('blueDragons'):1})
-    print(q3)
-
-
+    with open('queries2.txt','a') as m:
+    	print('\n Probabilidade do time Azul ganhar caso esteja com vantagem em experiencia, porem o time vermelho esteja com vantagem em gold: ',file=m)
+    	q1=modelo.query(variables=['blueWins'],evidence={('blueExperienceDiff'):'difPositiva' , ('blueGoldDiff'):'difNegativa'})
+    	print(q1,file=m)
+    	print('\n Probabilidade do time Azul ganhar caso tenha um placar de visao acima da media, nenhum dragao, e um numero de abates na media: ',file=m)
+    	q2=modelo.query(variables=['blueWins'],evidence={('blueTotalVisao'):'acMedia' , ('blueDragons'):0 , ('blueAbates'):'Media'})
+    	print(q2,file=m)
+    	print('\n Probabilidade do time Azul ganhar caso a media de level do time azul seja de 7 , o CS seja acima da Media, numero de abates abaixo da media e possuia um dragao. ',file=m)
+    	q3=modelo.query(variables=['blueWins'],evidence={('blueAvgLevelRounded'):7 , ('blueCSPerMin'):'acMedia', ('blueAbates'):'abMedia', ('blueDragons'):1})
+    	print(q3,file=m)
 if __name__ == '__main__':
     main()

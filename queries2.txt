@@ -1,0 +1,27 @@
+
+ Probabilidade do time Azul ganhar caso esteja com vantagem em experiencia, porem o time vermelho esteja com vantagem em gold: 
++-------------+-----------------+
+| blueWins    |   phi(blueWins) |
++=============+=================+
+| blueWins(0) |          0.5373 |
++-------------+-----------------+
+| blueWins(1) |          0.4627 |
++-------------+-----------------+
+
+ Probabilidade do time Azul ganhar caso tenha um placar de visao acima da media, nenhum dragao, e um numero de abates na media: 
++-------------+-----------------+
+| blueWins    |   phi(blueWins) |
++=============+=================+
+| blueWins(0) |          0.5409 |
++-------------+-----------------+
+| blueWins(1) |          0.4591 |
++-------------+-----------------+
+
+ Probabilidade do time Azul ganhar caso a media de level do time azul seja de 7 , o CS seja acima da Media, numero de abates abaixo da media e possuia um dragao. 
++-------------+-----------------+
+| blueWins    |   phi(blueWins) |
++=============+=================+
+| blueWins(0) |          0.3349 |
++-------------+-----------------+
+| blueWins(1) |          0.6651 |
++-------------+-----------------+
